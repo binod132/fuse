@@ -77,3 +77,21 @@ spec:
             name: argocd-server
             port:
               number: 80
+
+
+### Image updater
+kubectl create namespace argocd-image-updater
+
+kubectl apply -n argocd-image-updater -f https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/master/manifests/install.yaml
+
+
+#Sync docker hub
+kubectl create secret generic dockerhub-creds \
+  --from-literal=username=binod1243 \
+  --from-literal=password=<docker hub password>\
+  -n argocd
+# update helm image tag
+kubectl create secret generic git-creds \
+  --from-literal=username=binod132 \
+  --from-literal=password=<git PAT> \
+  -n argocd
