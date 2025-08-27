@@ -330,7 +330,9 @@ spec:
   - If drift is detected, ArgoCD applies the changes declaratively, ensuring cluster state matches the Git repository.
 
 ---
+![CI](Jenkins.png)
 ![CD](CD.png)
 ![Image updater push new tag to helm value repo](imageupdater.png)
+![Pods](pods.png)
 
 
