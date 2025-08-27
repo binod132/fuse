@@ -82,7 +82,8 @@ spec:
 ### Image updater
 kubectl create namespace argocd-image-updater
 
-kubectl apply -n argocd-image-updater -f https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/master/manifests/install.yaml
+#kubectl apply -n argocd-image-updater -f https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/master/manifests/install.yaml
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/master/manifests/install.yaml
 
 
 #Sync docker hub
@@ -146,3 +147,7 @@ data:
 kubectl apply -f image-updater-config.yaml
 kubectl rollout restart deployment argocd-image-updater -n argocd-image-updater
 kubectl logs deployment/argocd-image-updater -n argocd-image-updater -f
+
+
+
+[](../../../../wp-content/uploads/2023/07/image-62.png)

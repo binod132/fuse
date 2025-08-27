@@ -8,10 +8,38 @@ metadata:
   #   app.kubernetes.io/part-of: argocd-image-updater
 data:
   log.level: debug
+  applications_api: argocd
+  argocd.server_addr: argocd-server.argocd # Or the FQDN/IP of ArgoCD service
+  argocd.grpc_web: "false"                # Only if needed
+  argocd.insecure: "true"
+  argocd.plaintext: "false"
   registries.conf: |
     registries:
       - name: Docker Hub
         api_url: https://registry-1.docker.io
         credentials: pullsecret:argocd-image-updater/dockerhub-creds-image-2
+        default: true
+        defaultns: library
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-image-updater-config
+  namespace: argocd-image-updater
+  # labels:
+  #   app.kubernetes.io/name: argocd-image-updater-config
+  #   app.kubernetes.io/part-of: argocd-image-updater
+data:
+  log.level: debug
+  # applications_api: argocd
+  # argocd.server_addr: argocd-server.argocd # Or the FQDN/IP of ArgoCD service
+  # argocd.grpc_web: "false"                # Only if needed
+  # argocd.insecure: "true"
+  # argocd.plaintext: "false"
+  registries.conf: |
+    registries:
+      - name: Docker Hub
+        api_url: https://registry-1.docker.io
+        credentials: pullsecret:argocd/dockerhub-creds-image-2
         default: true
         defaultns: library
