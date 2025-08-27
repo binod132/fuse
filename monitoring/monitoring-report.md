@@ -1,5 +1,5 @@
-Technical Document: Monitoring, Logging, and Alerting Implementation
-Scenario Overview
+# Technical Document: Monitoring, Logging, and Alerting Implementation
+## Scenario Overview
 
 To achieve end-to-end observability of the platform and ensure proactive issue detection, we deployed a comprehensive monitoring, logging, and alerting stack using Prometheus, Grafana, Loki, and Tempo.
 
@@ -9,10 +9,13 @@ Prometheus
 We installed the Prometheus stack via Helm with custom scrape configurations to monitor MySQL and NFS exporters alongside Kubernetes components.
 
 Helm Commands
-# Add Helm repos
+### Add Helm repos
+```bash
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo add grafana https://grafana.github.io/helm-charts
-helm repo update
+helm repo update```
+```yaml
+
 
 # Install Prometheus Stack with custom values
 helm install prometheus-stack prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace -f values.yaml
