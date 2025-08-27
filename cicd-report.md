@@ -330,6 +330,6 @@ spec:
   - If drift is detected, ArgoCD applies the changes declaratively, ensuring cluster state matches the Git repository.
 
 ---
-
+![CD](CD.png)
 
 
