@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: filesystem-alerts
+  namespace: monitoring
+spec:
+  groups:
+  - name: filesystem.rules
+    rules:
+    - alert: LowFreeSpaceOnNFSEXPORT
+      expr: node_filesystem_free_bytes{mountpoint="/exports"} < 1 * 1024 * 1024
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Low free space on /exports"
+        description: "Filesystem free space on /exports is below 10MB of NFS"
+
+    - alert: LowFreeSpaceOnMySQL
+      expr: node_filesystem_free_bytes{mountpoint="/var/lib/mysql"} < 1 * 1024 * 1024
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Low free space on /var/lib/mysql"
+        description: "Filesystem free space on /var/lib/mysql is below 10MB"

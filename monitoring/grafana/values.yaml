@@ -1,0 +1,41 @@
+prometheus:
+  prometheusSpec:
+    additionalScrapeConfigs:
+      - job_name: 'mysql-exporter'
+        static_configs:
+          - targets: ['172.21.0.8:9104']
+      - job_name: 'node-exporter'
+        static_configs:
+          - targets: ['172.21.0.9:9100']
+grafana:
+  enabled: true
+
+  # Configure datasources provisioning
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          access: proxy
+          url: http://prometheus-operated.monitoring.svc.cluster.local:9090
+          isDefault: false
+        - name: Loki
+          type: loki
+          access: proxy
+          url: http://loki.monitoring.svc.cluster.local:3100
+          isDefault: false
+        - name: Tempo
+          type: tempo
+          access: proxy
+          url: http://tempo.monitoring.svc.cluster.local:3200
+          isDefault: false
+  # (Optional) Admin password, or leave empty to auto-generate
+  adminPassword: "admin123"
+
+  # Enable persistence (optional)
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClassName: "local-path"
+

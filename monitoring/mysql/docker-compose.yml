@@ -1,0 +1,71 @@
+version: '3.7'
+
+networks:
+  k3d-net:
+    external: true
+    name: k3d-dev-cluster  # replace with actual k3d network name
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql2
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: appdb
+      MYSQL_ROOT_HOST: "%"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    networks:
+      - k3d-net
+
+  mysqld-exporter:
+    image: prom/mysqld-exporter:v0.15.1
+    container_name: mysqld-exporter
+    restart: always
+    environment:
+      DATA_SOURCE_NAME: exporter_user:exporter_password@(mysql:3306)/
+    ports:
+      - "9104:9104"
+    depends_on:
+      - mysql
+    networks:
+      - k3d-net
+    volumes:
+      - ./.my.cnf:/.my.cnf:ro
+    # command:
+    #   - '--collect.slave_status=false'
+  nfs-server:
+    image: itsthenetwork/nfs-server-alpine:latest
+    container_name: nfs-server
+    restart: always
+    environment:
+      SHARED_DIRECTORY: /exports
+    volumes:
+      - nfs-data:/exports
+    ports:
+      - "20490:2049"     # NFS port
+      - "11110:111"       # rpcbind port (required)
+    networks:
+      - k3d-net
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: always
+    ports:
+      - "9100:9100"
+    # pid: host
+    # network_mode: "host" # so it can access host-level disk mountpoints
+    networks:
+      - k3d-net
+    volumes:
+      - mysql-data:/host/var/lib/mysql:ro
+      - nfs-data:/host/exports:ro
+    command:
+      - '--path.rootfs=/host'
+volumes:
+  mysql-data:
+  nfs-data:

@@ -1,7 +1,23 @@
 
 # fuse
 # Install k3s 
+k3d cluster create dev-cluster \
+  --agents 2 \
+  --port "80:80@loadbalancer" \
+  --port "443:443@loadbalancer"
 
+kubectl -n kube-system get pods | grep traefik
+# If default traefik is running, disable by deleting or via k3d args
+
+# Create traefik namespace
+kubectl create namespace traefik
+
+# Add Helm repo and update
+helm repo add traefik https://traefik.github.io/charts
+helm repo update
+
+# Install Traefik
+helm install traefik traefik/traefik --namespace traefik
 
 # Install Jenkins on k3s
 helm repo add jenkins https://charts.jenkins.io
@@ -151,3 +167,12 @@ kubectl logs deployment/argocd-image-updater -n argocd-image-updater -f
 
 
 [](../../../../wp-content/uploads/2023/07/image-62.png)
+
+
+## Monitoring
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+
+kubectl create namespace monitoring
+
