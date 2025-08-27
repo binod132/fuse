@@ -180,3 +180,17 @@ SMTP email alert notifications are pending configuration.
 ### Log Dashboard
 Log dashboard is created to visulize and filter log of applications.
 ![Datasources to grafana](../images/log.png)
+
+## Tracing with Tempo
+
+Tempo is installed and configured as a data source in Grafana to enable distributed tracing.
+Application instrumentation to send trace data (via OpenTelemetry or similar) is pending. Once done, detailed request flows and latency issues can be analyzed effectively.
+
+## Summary and Next Steps
+
+- Installed Prometheus, Loki, Tempo, and Grafana using Helm with custom scrape configurations for MySQL and NFS monitoring.
+- Created dashboards for Kubernetes, MySQL, NFS metrics and Loki logs with filtering capabilities.
+- Alerts for MySQL availability and NFS storage utilization below threshold are firing successfully.
+### Next Steps
+- Configure Alertmanager SMTP to enable email notifications on alert triggers.
+- Instrument applications with OpenTelemetry to enable sending trace data to Tempo.

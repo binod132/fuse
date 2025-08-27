@@ -165,14 +165,3 @@ kubectl rollout restart deployment argocd-image-updater -n argocd-image-updater
 kubectl logs deployment/argocd-image-updater -n argocd-image-updater -f
 
 
-
-[](../../../../wp-content/uploads/2023/07/image-62.png)
-
-
-## Monitoring
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo add grafana https://grafana.github.io/helm-charts
-helm repo update
-
-kubectl create namespace monitoring
-
