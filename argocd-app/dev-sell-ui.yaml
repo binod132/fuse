@@ -4,12 +4,12 @@ metadata:
   name: fuse-dev
   namespace: argocd
   annotations:
-    argocd-image-updater.argoproj.io/image-list: binod1243/fuse:2025.08.27-36
-    argocd-image-updater.argoproj.io/binod1243.fuse.update-strategy: digest
+    argocd-image-updater.argoproj.io/image-list: myimage=binod1243/fuse
+    argocd-image-updater.argoproj.io/myimage.update-strategy: name
     # argocd-image-updater.argoproj.io/binod1243.fuse.image-name: image.name
     # argocd-image-updater.argoproj.io/binod1243.fuse.image-tag: image.tag
-    argocd-image-updater.argoproj.io/binod1243.fuse.allow-tags: /^\\d{4}\.\\d{2}\.\\d{2}-\\d+$/
-    argocd-image-updater.argoproj.io/binod1243.fuse.pull-secret: pullsecret:argocd-image-updater/dockerhub-creds-image-2
+    argocd-image-updater.argoproj.io/myimage.allow-tags: regexp:^[0-9]{4}-[0-9]{2}[0-9]{2}$
+    argocd-image-updater.argoproj.io/myimage.pull-secret: pullsecret:argocd-image-updater/dockerhub-creds-image-2
     argocd-image-updater.argoproj.io/write-back-method: git
     argocd-image-updater.argoproj.io/write-back-credentials: secret:argocd/git-creds
     argocd-image-updater.argoproj.io/git-credentials: secret:argocd/git-creds
