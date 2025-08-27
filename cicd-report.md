@@ -1,7 +1,5 @@
 # CI/CD Pipeline Implementation Report
-
 ---
-
 ## 1. Introduction
 
 This document describes the implementation of a modern, automated CI/CD pipeline for a Kubernetes-based application using:
