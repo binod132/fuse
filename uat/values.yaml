@@ -7,7 +7,7 @@ fullnameOverride: "dev-seller-ui"
 command: #["/bin/sh", "-c", "sleep"] ##### Must Remove if not needed
 replicaCount: 1
 image:
-  repository: binod1243/fuse
+  name: binod1243/fuse
   tag: "2025.08.27-36"
   pullPolicy: Always
 imagePullSecrets:
