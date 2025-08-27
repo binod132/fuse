@@ -95,6 +95,12 @@ kubectl create secret generic git-creds \
   --from-literal=username=binod132 \
   --from-literal=password=<git PAT> \
   -n argocd
+kubectl create secret docker-registry dockerhub-creds-image-2 \
+  --docker-server=https://registry-1.docker.io \
+  --docker-username=binod1243 \
+  --docker-password='DevOps@123' \
+  --docker-email=adhikaribinod132@gmail.com \
+  -n argocd-image-updater
 
 #Role binding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -110,4 +116,33 @@ subjects:
     name: argocd-image-updater
     namespace: argocd-image-updater
 
+#for private docker hub
+kubectl create configmap argocd-image-updater-registries \
+  --namespace argocd-image-updater \
+  --from-literal=registries.conf='registries:
+  - name: Docker Hub
+    prefix: docker.io
+    credentials: secret:argocd/dockerhub-creds-image
+    default: true'
+
+#Update config
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-image-updater-config
+  namespace: argocd-image-updater
+  labels:
+    app.kubernetes.io/name: argocd-image-updater-config
+    app.kubernetes.io/part-of: argocd-image-updater
+data:
+  registries.conf: |
+    registries:
+      - name: Docker Hub
+        api_url: https://index.docker.io/v1/
+        prefix: docker.io
+        credentials: secret:argocd-image-updater/dockerhub-creds-image
+        default: true
+
+kubectl apply -f image-updater-config.yaml
 kubectl rollout restart deployment argocd-image-updater -n argocd-image-updater
+kubectl logs deployment/argocd-image-updater -n argocd-image-updater -f

@@ -1,0 +1,8 @@
+apiVersion: v1
+data:
+ .dockerconfigjson: eyJhdXRocyI6eyJodHRwczovL3JlZ2lzdHJ5LTEuZG9ja2VyLmlvIjp7InVzZXJuYW1lIjoiYmlub2QxMjQzIiwicGFzc3dvcmQiOiJkY2tyX3BhdF95UVM2VU0ycWVTSEtqenFDdEFxUVhMdWRsOGsifX19
+kind: Secret
+metadata:
+ name: dockerhub-creds-image
+ namespace: argocd-image-updater
+type: kubernetes.io/dockerconfigjson
