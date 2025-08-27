@@ -4,8 +4,8 @@ metadata:
   name: fuse-dev
   namespace: argocd
   annotations:
-    argocd-image-updater.argoproj.io/image-list: binod1243/fuse
-    argocd-image-updater.argoproj.io/binod1243.fuse.update-strategy: alphabetical
+    argocd-image-updater.argoproj.io/image-list: binod1243/fuse:2025.08.27-36
+    argocd-image-updater.argoproj.io/binod1243.fuse.update-strategy: digest
     # argocd-image-updater.argoproj.io/binod1243.fuse.image-name: image.name
     # argocd-image-updater.argoproj.io/binod1243.fuse.image-tag: image.tag
     argocd-image-updater.argoproj.io/binod1243.fuse.allow-tags: /^\\d{4}\.\\d{2}\.\\d{2}-\\d+$/
