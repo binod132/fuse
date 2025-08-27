@@ -169,5 +169,5 @@ NFS storage utilization — triggers if available storage utilized above 40GB.
 Alerts are firing correctly in Grafana based on the defined Prometheus alerting rules.
 
 SMTP email alert notifications are pending configuration.
-![Alets on grafana](../images/Screenshot%202025-08-27%20at%2011.39.41%E2%80%AFpm.png)
+![Alets on grafana](../images/nfs-alert.png)
 
