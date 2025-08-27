@@ -152,12 +152,18 @@ services:
     command:
       - '--path.rootfs=/host'
 ```
-## Dashboards and Alerts
+## Datasource, Dashboards and Alerts
+Prometheus for kubernetes, pod, mysql and nfs metrics
+Loki for logs of application 
+Tempo for tracing
+![Datasources to grafana](../images/datasource.png)
+
 ### Dashboards
 The Prometheus Helm stack includes dashboards for Kubernetes cluster and pod monitoring by default.
 Custom logging dashboards were created in Grafana using the Loki data source with filters by namespace and container labels to ease troubleshooting.
 
 Dashboards for kubernetes stack, pod, contianer MySQL and NFS monitor metrics including storage utilization.
+![Datasources to grafana](../images/kubernetes.png)
 ### Alerts
 
 Alerts are configured to monitor:
@@ -171,3 +177,6 @@ Alerts are firing correctly in Grafana based on the defined Prometheus alerting 
 SMTP email alert notifications are pending configuration.
 ![Alets on grafana](../images/nfs-alert.png)
 
+### Log Dashboard
+Log dashboard is created to visulize and filter log of applications.
+![Datasources to grafana](../images/log.png)
