@@ -1,0 +1,8 @@
+helm:
+  parameters:
+  - name: image.name
+    value: binod1243/fuse
+    forcestring: true
+  - name: image.tag
+    value: 2025.08.27-38
+    forcestring: true
