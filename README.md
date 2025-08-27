@@ -98,7 +98,7 @@ kubectl create secret generic git-creds \
 kubectl create secret docker-registry dockerhub-creds-image-2 \
   --docker-server=https://registry-1.docker.io \
   --docker-username=binod1243 \
-  --docker-password='DevOps@123' \
+  --docker-password='<docker hub pass>' \
   --docker-email=adhikaribinod132@gmail.com \
   -n argocd-image-updater
 
