@@ -95,3 +95,17 @@ kubectl create secret generic git-creds \
   --from-literal=username=binod132 \
   --from-literal=password=<git PAT> \
   -n argocd
+
+#Role binding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: argocd-image-updater-access
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: argocd-application-controller
+subjects:
+  - kind: ServiceAccount
+    name: argocd-image-updater
+    namespace: argocd-image-updater
