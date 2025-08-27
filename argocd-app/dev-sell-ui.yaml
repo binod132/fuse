@@ -14,7 +14,7 @@ spec:
   source:
     repoURL: https://github.com/binod132/fuse
     targetRevision: main
-    path: helm-mircoservice
+    path: helm-microservice
     helm:
       valueFiles:
         - ../dev/values.yaml
