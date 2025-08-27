@@ -1,0 +1,3 @@
+chartName: "helm-microservice"
+chartVersion: "0.1.0"
+appVersion: "1.16.0"

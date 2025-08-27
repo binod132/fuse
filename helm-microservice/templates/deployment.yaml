@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+  labels:
+    {{- include "helm-microservice.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "helm-microservice.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+        timestamp: "{{ now | date "20060102150405" }}"
+      labels:
+        {{- include "helm-microservice.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- toYaml .Values.env | nindent 12 }}
+          {{- if .Values.command }}
+          command: {{ .Values.command | toJson }}
+          {{- end }}
+          envFrom:
+          - secretRef:
+              name: {{ .Values.nameOverride | default .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+          ports:
+            {{- range .Values.containerPorts }}
+            - name: {{ .name }}
+              containerPort: {{ .containerPort }}
+              protocol: {{ .protocol }}
+            {{- end }}
+          {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            {{- if .Values.pvc.enabled }}
+            {{- range $name, $pvc := .Values.pvc.definitions }}
+            - name: {{ $pvc.volumeName }}
+              mountPath: {{ $pvc.mountPath }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.configmap.enabled }}
+            {{- range $name, $configmap := .Values.configmap.definitions }}
+            - name: {{ $configmap.name }}
+              mountPath: {{ $configmap.mountPath }}
+              subPath: {{ $configmap.subPath }}
+            {{- end }}
+            {{- end }}
+      volumes:
+        {{- if .Values.pvc.enabled }}
+        {{- range $name, $pvc := .Values.pvc.definitions }}
+        - name: {{ $pvc.volumeName }}
+          persistentVolumeClaim:
+            claimName: {{ $name }}
+        {{- end }}
+        {{- end }}
+        {{- if .Values.configmap.enabled }}
+        {{- range $name, $configmap := .Values.configmap.definitions }}
+        - name: {{ $configmap.name }}
+          configMap:
+            name: {{ $configmap.name }}
+        {{- end }}
+        {{- end }}
+      dnsPolicy: ClusterFirst
+      hostAliases:
+        {{- toYaml .Values.hostAliases | nindent 12 }}
+      imagePullSecrets:
+        {{- range .Values.imagePullSecrets }}
+        - name: {{ .name }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,24 @@
+{{- if .Values.gateway.enabled }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: {{ .Values.nameOverride }}-gateway  # Dynamically generate the gateway name
+  namespace: {{ .Values.gateway.namespace }}
+  {{- if .Values.gateway.loadBalancerIP }}
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: {{ .Values.gateway.loadBalancerIP }}
+  {{- end }}
+spec:
+  gatewayClassName: {{ .Values.gateway.className | default "istio" }}
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+    - name: https
+      port: 443
+      protocol: HTTPS
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: {{ .Values.nameOverride }}-tls-cert  # Dynamically generate certificate reference
+{{- end }}

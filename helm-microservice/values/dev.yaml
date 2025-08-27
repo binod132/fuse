@@ -1,0 +1,185 @@
+############################### Chart Info #######################
+chartVersion: "0.1.1"
+appVersion: "1.16.0"
+nameOverride: "internal-ibft-switch-test"
+fullnameOverride: "internal-ibft-switch-test"
+############################## Deployment ########################
+command: ["/bin/sh", "-c", "java $JAVA_OPTS -jar /app/fonepay-internal-ibft-0.0.1-SNAPSHOT.jar"] ##### Must Remove if not needed
+replicaCount: 1
+image:
+  repository: harbor.fonepay.com/fonepaylive/fonepay-internal-switch
+  tag: "2023.01.22-81"
+  pullPolicy: Always
+imagePullSecrets:
+  - name: repo-old
+  - name: repo-new
+resources:
+  limits:
+    cpu: 2
+    memory: 7000Mi
+  requests:
+   cpu: 1
+   memory: 3000Mi
+containerPorts:
+  - name: http-8080
+    containerPort: 8080
+    protocol: TCP
+  - name: management
+    containerPort: 9999
+    protocol: TCP
+env:
+  - name: management.server.port
+    value: '9999'
+  - name: spring.profiles.active
+    value: prod
+  - name: server.port
+    value: '8080'
+  - name: JAVA_OPTS
+    value: "-XX:NativeMemoryTracking=summary -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:G1HeapRegionSize=4m -XX:+UnlockExperimentalVMOptions -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=60 -XX:G1ReservePercent=15 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1MixedGCCountTarget=16 -XX:G1HeapWastePercent=10 -XX:ParallelGCThreads=4 -XX:ConcGCThreads=2 -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/heapdump.hprof -XX:+ExitOnOutOfMemoryError -Xlog:gc*:file=/tmp/gc.log:time,uptime,level,tags:filecount=5,filesize=10M"
+  #  value: "-Xms2g -Xmx4g -XX:+UseG1GC"
+  #  value: "-XX:NativeMemoryTracking=summary -Xms1g -Xmx5g -XX:InitialRAMPercentage=25 -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=45 -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=512m -XX:ReservedCodeCacheSize=256m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/heapdump.hprof -XX:+ExitOnOutOfMemoryError -XX:+CrashOnOutOfMemoryError -XX:+AlwaysPreTouch -XX:+UnlockExperimentalVMOptions -XX:+UseStringDeduplication -Xlog:gc*:file=/tmp/gc.log:time,uptime,level,tags:filecount=5,filesize=10M -XX:ErrorFile=/tmp/hs_err_pid%p.log"
+  #  value: "-Xms5g -Xmx5g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=45 -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=512m -XX:ReservedCodeCacheSize=256m -XX:HeapDumpPath=/tmp/heapdump.hprof -XX:+HeapDumpOnOutOfMemoryError -XX:+ExitOnOutOfMemoryError -XX:+CrashOnOutOfMemoryError -XX:+AlwaysPreTouch -XX:+UnlockExperimentalVMOptions -XX:+UseStringDeduplication -Xlog:gc*:file=/tmp/gc.log:time,uptime,level,tags:filecount=5,filesize=10M"
+  #  value: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=50.0 -XX:MaxMetaspaceSize=256m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=6 -XX:ConcGCThreads=6 -XX:InitiatingHeapOccupancyPercent=35 -XX:+DisableExplicitGC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/heapdump.hprof -XX:+ExitOnOutOfMemoryError"
+livenessProbe:
+  enabled: false
+  httpGet:
+    path: /actuator/health/livenessStateProbeIndicator
+    port: 9999
+    scheme: HTTP
+  initialDelaySeconds: 45
+  periodSeconds: 5
+  successThreshold: 1
+  failureThreshold: 3
+  timeoutSeconds: 2
+
+readinessProbe:
+  enabled: false
+  httpGet:
+    path: /actuator/health/readiness
+    port: 9999
+    scheme: HTTP
+  # exec:
+  #   command: ["/bin/true"]
+  initialDelaySeconds: 45
+  periodSeconds: 5
+  successThreshold: 1
+  failureThreshold: 3
+  timeoutSeconds: 2
+podSecurityContext:
+  runAsUser: 1002    # UID for fonepay user
+  runAsGroup: 1002    # GID for fonepay group
+  fsGroup: 1002       # Ensure file access by the fonepay group
+
+SERVICE_NAME: internal-ibft-switch-test
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+hostAliases:
+  - hostnames: 
+    - abc.com
+    ip: 10.31.214.13
+################################### Service ##############################
+service:
+  enabled: true
+  type: ClusterIP
+  internalPort: 8080
+  managementPort: 9999
+  ingressport: 80
+  loadBalancerIP: 
+#################################### HPA #################################
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 
+  targetMemoryUtilizationPercentage: 200
+################################## Service Account ########################
+serviceAccount:
+  create: true
+  name: "internal-ibft-switch-test"
+################################## Ingress ################################
+ingress:
+  enabled: false
+################################## To expose using gateway ################
+certificate:
+  enabled: true
+  name: qr-switch-self-signed-cert
+#  namespace: qr-switch
+  secretName: qr-switch-tls-secret
+  issuer:
+    name: selfsigned-issuer
+    kind: Issuer
+  commonName: "www.test.fonepay.com"
+  dnsNames:
+    - "www.test.fonepay.com"
+    - "test.fonepay.com"
+  duration: "8760h"
+  renewBefore: "360h"
+
+gateway:
+  enabled: true
+  className: istio
+  name: qr-switch-gateway
+  # namespace: qr-switch
+  loadBalancerIP: 
+  hostnames: 
+    - "www.test.fonepay.com"
+    - "test.fonepay.com"
+
+httproute:
+  enabled: true
+  name: qr-switch-httproute
+  # namespace: qr-switch
+################################# PVC ##################################
+pvc:
+  enabled: true
+  definitions:
+    internal-ibft-switch-test-deploy:
+      volumeName: volume-internal-ibft-switch-test-deploy
+      mountPath: /app/config/deploy
+      accessModes:
+        - ReadWriteMany
+      storageClassName: ceph-filesystem
+      resources:
+        requests:
+          storage: 1Gi
+    internal-ibft-switch-test-cfg:
+      volumeName: volume-internal-ibft-switch-test-cfg
+      mountPath: /app/config/cfg
+      accessModes:
+        - ReadWriteMany
+      storageClassName: ceph-filesystem
+      resources:
+        requests:
+          storage: 1Gi
+    internal-ibft-switch-test-log:
+      volumeName: volume-internal-ibft-switch-test-log
+      mountPath: /app/config/log
+      accessModes:
+        - ReadWriteMany
+      storageClassName: ceph-filesystem
+      resources:
+        requests:
+          storage: 1Gi
+######Secrets###################
+data:
+  auth.clientSecret: dGVzdA==
+#################################### Configmap ############################################
+configmap:
+  enabled: true
+  definitions:
+    internal-ibft-switch-test-config:
+      name: internal-ibft-switch-test-config
+      mountPath: /app/config/application-prod.properties
+      subPath: application-prod.properties
+      data:
+        application-prod.properties: |
+          test= test
+
+
+
+
+
+
+

@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+  labels:
+    {{- include "helm-microservice.labels" . | nindent 4 }}
+    {{- with .Values.serviceLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- if .Values.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
+  {{- end }}
+  ports:
+    {{- if .Values.service.internalPort }}
+    - port: {{ .Values.service.internalPort }}
+      targetPort: {{ .Values.service.internalPort }}
+      protocol: TCP
+      name: internal
+    {{- end }}
+    {{- if .Values.service.ingressport }}
+    - port: {{ .Values.service.ingressport }}
+      targetPort: {{ .Values.service.internalPort }}
+      protocol: TCP
+      name: ingress
+    {{- end }}
+    {{- if .Values.service.managementPort }}
+    - port: {{ .Values.service.managementPort }}
+      targetPort: {{ .Values.service.managementPort }}
+      protocol: TCP
+      name: management
+    {{- end }}
+  selector:
+    {{- include "helm-microservice.selectorLabels" . | nindent 4 }}
