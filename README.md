@@ -109,3 +109,5 @@ subjects:
   - kind: ServiceAccount
     name: argocd-image-updater
     namespace: argocd-image-updater
+
+kubectl rollout restart deployment argocd-image-updater -n argocd-image-updater

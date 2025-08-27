@@ -7,7 +7,7 @@ metadata:
     argocd-image-updater.argoproj.io/image-list: binod1243/fuse
     argocd-image-updater.argoproj.io/binod1243.fuse.update-strategy: latest
     argocd-image-updater.argoproj.io/binod1243.fuse.allow-tags: regexp:^20\d{2}\.\d{2}\.\d{2}-\d+$
-    argocd-image-updater.argoproj.io/binod1243.fuse.pull-secret: pullsecret:argocd/dockerhub-creds
+    argocd-image-updater.argoproj.io/binod1243.fuse.pull-secret: pullsecret:argocd/dockerhub-creds-image
     argocd-image-updater.argoproj.io/write-back-method: git
     argocd-image-updater.argoproj.io/write-back-credentials: secret:argocd/git-creds
     argocd-image-updater.argoproj.io/git-credentials: secret:argocd/git-creds
