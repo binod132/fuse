@@ -19,7 +19,7 @@ spec:
     path: helm-microservice
     helm:
       valueFiles:
-        - ../dev/values.yaml
+        - ../uat/values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: uat
