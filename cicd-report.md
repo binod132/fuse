@@ -331,5 +331,6 @@ spec:
 
 ---
 ![CD](CD.png)
+![Image updater push new tag to helm value repo](imageupdater.png)
 
 
