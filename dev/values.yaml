@@ -1,0 +1,176 @@
+############################### Chart Info #######################
+chartVersion: "0.1.1"
+appVersion: "1.16.0"
+nameOverride: "dev-seller-ui"
+fullnameOverride: "dev-seller-ui"
+############################## Deployment ########################
+command: #["/bin/sh", "-c", "sleep"] ##### Must Remove if not needed
+replicaCount: 1
+image:
+  repository: binod1243/fuse
+  tag: "2025.08.27-33"
+  pullPolicy: Always
+imagePullSecrets:
+  - name: repo-old
+  - name: repo-new
+resources:
+  limits:
+    cpu: 1
+    memory: 1000Mi
+  requests:
+   cpu: 100m
+   memory: 300Mi
+containerPorts:
+  - name: http-8080
+    containerPort: 8080
+    protocol: TCP
+  - name: management
+    containerPort: 9999
+    protocol: TCP
+env:
+  - name: management.server.port
+    value: '9999'
+
+livenessProbe:
+  enabled: false
+  httpGet:
+    path: /actuator/health/livenessStateProbeIndicator
+    port: 9999
+    scheme: HTTP
+  initialDelaySeconds: 45
+  periodSeconds: 5
+  successThreshold: 1
+  failureThreshold: 3
+  timeoutSeconds: 2
+
+readinessProbe:
+  enabled: false
+  httpGet:
+    path: /actuator/health/readiness
+    port: 9999
+    scheme: HTTP
+  # exec:
+  #   command: ["/bin/true"]
+  initialDelaySeconds: 45
+  periodSeconds: 5
+  successThreshold: 1
+  failureThreshold: 3
+  timeoutSeconds: 2
+podSecurityContext:
+  runAsUser: 0   # UID for fusemachine user
+  runAsGroup: 0    # GID for fusemachine group
+  fsGroup: 0      # Ensure file access by the fusemachine group
+
+SERVICE_NAME: dev-seller-ui
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+hostAliases:
+  - hostnames: 
+    - abc.com
+    ip: 10.31.214.13
+################################### Service ##############################
+service:
+  enabled: true
+  type: ClusterIP
+  internalPort: 8080
+  managementPort: 9999
+  ingressport: 80
+  loadBalancerIP: 
+#################################### HPA #################################
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 
+  targetMemoryUtilizationPercentage: 200
+################################## Service Account ########################
+serviceAccount:
+  create: true
+  name: "dev-seller-ui"
+################################## Ingress ################################
+ingress:
+  enabled: false
+################################## To expose using gateway ################
+certificate:
+  enabled: false
+  name: dev-seller-ui-self-signed-cert
+#  namespace: dev-seller-ui
+  secretName: dev-seller-ui-tls-secret
+  issuer:
+    name: selfsigned-issuer
+    kind: Issuer
+  commonName: "www.test.fusemachine.com"
+  dnsNames:
+    - "www.test.fusemachine.com"
+    - "test.fusemachine.com"
+  duration: "8760h"
+  renewBefore: "360h"
+
+gateway:
+  enabled: false
+  className: istio
+  name: dev-seller-ui-gateway
+  # namespace: dev-seller-ui
+  loadBalancerIP: 
+  hostnames: 
+    - "www.test.fusemachine.com"
+    - "test.fusemachine.com"
+
+httproute:
+  enabled: false
+  name: dev-seller-ui-httproute
+  # namespace: dev-seller-ui
+################################# PVC ##################################
+pvc:
+  enabled: false
+  definitions:
+    dev-seller-ui-deploy:
+      volumeName: volume-dev-seller-ui-deploy
+      mountPath: /app/config/deploy
+      accessModes:
+        - ReadWriteMany
+      storageClassName: ceph-filesystem
+      resources:
+        requests:
+          storage: 1Gi
+    dev-seller-ui-cfg:
+      volumeName: volume-dev-seller-ui-cfg
+      mountPath: /app/config/cfg
+      accessModes:
+        - ReadWriteMany
+      storageClassName: ceph-filesystem
+      resources:
+        requests:
+          storage: 1Gi
+    dev-seller-ui-log:
+      volumeName: volume-dev-seller-ui-log
+      mountPath: /app/config/log
+      accessModes:
+        - ReadWriteMany
+      storageClassName: ceph-filesystem
+      resources:
+        requests:
+          storage: 1Gi
+######Secrets###################
+data:
+  auth.clientSecret: dGVzdA==
+#################################### Configmap ############################################
+configmap:
+  enabled: true
+  definitions:
+    dev-seller-ui-config:
+      name: dev-seller-ui-config
+      mountPath: /app/config/application-prod.properties
+      subPath: application-prod.properties
+      data:
+        application-prod.properties: |
+          test= test
+
+
+
+
+
+
+
